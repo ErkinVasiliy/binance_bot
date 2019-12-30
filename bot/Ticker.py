@@ -1,28 +1,24 @@
-deprecated_t = ['DENTBTC', 'BCHSVBTC', 'BCCBTC', 'TRIGBTC', 'SALTBTC', 'CLOAKBTC', 'RPXBTC', 'ICNBTC']
+deprecated_tickers = ['DENTBTC', 'BCHSVBTC', 'BCCBTC', 'TRIGBTC', 'SALTBTC',
+                      'CLOAKBTC', 'RPXBTC', 'ICNBTC']
+
+COINS_TYPES = ['USDT', 'BTC']
 
 
 class Tickers:
     def __init__(self, client):
         self._client = client
         self._prices = None
-        self.update()
 
     def update(self):
         self._prices = {t['symbol']: float(t['price'])
-                        for t in self._client.get_all_tickers()
-                        if t['symbol'] not in deprecated_t}
+                        for t in self._client.get_all_tickers() if t['symbol']
+                        not in deprecated_tickers}
 
-    def coin_price(self, coin_name):
-        #here is a problem with usdc, tusd, and some other coins
-        #need to fix it
+    def get_tickers(self, type='BTC'):
+        type = type if type in COINS_TYPES else 'BTC'
+        return [ticker for ticker, price in self._prices.items()
+                if ticker.endswith(type)]
 
-        if coin_name.find('USD') != -1:
-            return self._prices['USDTBTC']
+    def __getitem__(self, item):
+        return self._prices[item]
 
-        if coin_name in ['BTC', 'BGBP']:
-            return 1.0
-        return self._prices[coin_name + 'BTC']
-
-    @property
-    def all_tickers(self):
-        return [key for key in self._prices.keys() if key.find('USD') == -1]
