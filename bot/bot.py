@@ -1,20 +1,20 @@
 from binance.client import Client
 
 from .variables import API_KEY, SECRET_KEY
-from .Utils import timeit
-from .Ticker import Tickers
+from .BalanceInfo import AccountBalance
+
+from time import sleep
 
 
-@timeit
+def print_balance(client):
+    ab = AccountBalance(client)
+    while True:
+        print(str(ab))
+        sleep(10)
+
+
 def run():
     client = Client(API_KEY, SECRET_KEY)
-
-    coins = Tickers(client)
-    coins.update()
-
-    #animate_plot(kl, t, window=50)
-
-
-
+    print_balance(client)
 
 
