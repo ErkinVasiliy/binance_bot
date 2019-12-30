@@ -15,6 +15,7 @@ class Tickers:
                         not in deprecated_tickers}
 
     def get_tickers(self, type='BTC'):
+        self.update()
         type = type if type in COINS_TYPES else 'BTC'
         return [ticker for ticker, price in self._prices.items()
                 if ticker.endswith(type)]
