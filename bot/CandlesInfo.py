@@ -9,31 +9,24 @@ klines_keys = [
 ]
 
 
-class KlinesInfo:
+class Candles:
     def __init__(self, klines):
         self._klines = klines
 
-
-    @staticmethod
-    def __prepare_data(klines_list):
-
-
-
+    @classmethod
+    def from_list(cls, klines_list):
         df = pd.DataFrame(klines_list, columns=klines_keys)
-        df = df[['Open time', 'Open', 'High', 'Low', 'Close', 'BTC Volume']]
-        df['datetime'] = df['Open time'].apply(ut2dt)
-        #df['Time'] = df['datetime'].apply(mdates.date2num)
 
+        df['datetime'] = df['Open time'].apply(ut2dt)
         df['Open'] = df['Open'].astype(float)
         df['High'] = df['High'].astype(float)
         df['Low'] = df['Low'].astype(float)
         df['Close'] = df['Close'].astype(float)
 
-        return df[['datetime', 'Open', 'High', 'Low', 'Close', 'BTC Volume']]
+        return cls(df[['datetime', 'Open', 'High', 'Low', 'Close', 'BTC Volume']])
 
-    @classmethod
-    def from_list(cls, klines_list):
-        return KlinesInfo(cls.__prepare_data(klines_list))
+    def __getitem__(self, val):
+        return Candles(self._klines.iloc[val])
 
     @property
     def size(self):
@@ -43,23 +36,6 @@ class KlinesInfo:
     def columns(self):
         return [v for k, v in self._klines.items()]
 
-    def last_candles(self, num=1):
-        return KlinesInfo(self._klines[-num:])
-
-    @property
-    def change(self):
-        return (self._klines.iloc[-1]['Close'] / self._klines.iloc[0]['Open'] - 1.0) * 100.0
-
-
-    def to_dict(self):
-        return self._klines.to_dict('records')
-
     def dump(self, path=''):
         self._klines.to_csv(join(path, 'candles.csv'), index=False)
-
-
-def get_klines(client, interval='1h', symbol='TNTBTC'):
-    klines_list = client.get_klines(symbol=symbol, interval=interval, limit=125)
-    return KlinesInfo(klines_list)
-
 

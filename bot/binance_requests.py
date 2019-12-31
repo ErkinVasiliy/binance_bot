@@ -1,7 +1,7 @@
 import requests
 from concurrent.futures import ThreadPoolExecutor
 
-from .CandlesInfo import KlinesInfo
+from .CandlesInfo import Candles
 from collections import OrderedDict
 
 
@@ -12,7 +12,7 @@ def get_candles(ticker, interval='5m'):
 
 
 def task(ticker):
-    kl = KlinesInfo.from_list(get_candles(ticker))
+    kl = Candles.from_list(get_candles(ticker))
 
     return ticker, kl
 
