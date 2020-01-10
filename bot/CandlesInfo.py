@@ -10,11 +10,12 @@ klines_keys = [
 
 
 class Candles:
-    def __init__(self, klines):
+    def __init__(self, klines, ticker=None):
         self._klines = klines
+        self._ticker = ticker
 
     @classmethod
-    def from_list(cls, klines_list):
+    def from_list(cls, klines_list, ticker=None):
         df = pd.DataFrame(klines_list, columns=klines_keys)
 
         df['datetime'] = df['Open time'].apply(ut2dt)
@@ -24,13 +25,12 @@ class Candles:
         df['Close'] = df['Close'].astype(float)
         df['BTC Volume'] = df['BTC Volume'].astype(float)
 
-        return cls(df[['datetime', 'Open', 'High', 'Low', 'Close', 'BTC Volume']])
+        return cls(df[['datetime', 'Open', 'High', 'Low', 'Close', 'BTC Volume']], ticker)
 
     def __getitem__(self, val):
-        return Candles(self._klines.iloc[val])
+        return Candles(self._klines.iloc[val], self._ticker)
 
-    @property
-    def size(self):
+    def __len__(self):
         return self._klines.index.size
 
     @property
@@ -38,5 +38,5 @@ class Candles:
         return [v for k, v in self._klines.items()]
 
     def dump(self, path=''):
-        self._klines.to_csv(join(path, 'candles.csv'), index=False)
+        self._klines.to_csv(join(path, '{}.csv'.format(self._ticker)), index=False)
 

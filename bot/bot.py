@@ -7,7 +7,7 @@ from time import sleep
 
 from .BalanceInfo import AccountBalance
 from .CandlesInfo import Candles
-from .binance_requests import get_candles
+from .binance_requests import get_candles, get_all_candles
 from .plotter import plot
 
 
@@ -37,12 +37,23 @@ def print_balance(args):
 
 
 def get_klines(args):
+    print(args)
     settings = read_settings(args.settings)
+    client = Client(settings[API_KEY], settings[SECRET_KEY])
+    ab = AccountBalance(client)
 
-    candles_list = get_candles('TNTBTC')
-    candles = Candles.from_list(candles_list)
-    candles.dump(settings[SAVE_PATH])
-    plot(candles, 'TNTBTC')
+    tickers = ab.get_tickers(args.ctype)
+    candles = get_all_candles(tickers)
+
+    for t, c in candles.items():
+        print(t)
+        c = c[-200:]
+
+        if len(c) == 0:
+            continue
+
+        c.dump(settings[SAVE_PATH])
+        plot(c, t)
 
 
 def run():
@@ -65,7 +76,7 @@ def run():
     build_g = work_type.add_parser('build_graphs',
                                    help='Build graph of candles and save')
     build_g.add_argument('--ctype', help='Choose type of graph', dest='ctype',
-                         choices=['btc', 'usdt', 'all'], default='all')
+                         choices=['BTC', 'USDT'], default='BTC')
     build_g.set_defaults(command=get_klines)
 
     args = parser.parse_args()

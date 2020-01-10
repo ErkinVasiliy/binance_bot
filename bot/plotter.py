@@ -73,6 +73,7 @@ def plot(klines, symbol, fig=None):
     plt.title(symbol)
     fig.savefig(r'C:\graphs\{}.png'.format(symbol), format='png',
                 dpi=400)
+    plt.close()
     #plt.show()
 
 

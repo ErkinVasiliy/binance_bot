@@ -5,14 +5,14 @@ from .CandlesInfo import Candles
 from collections import OrderedDict
 
 
-def get_candles(ticker, interval='5m'):
+def get_candles(ticker, interval='1d'):
     url = 'https://api.binance.com/api/v1/klines?symbol='+ticker+'&interval='+interval
     data = requests.get(url).json()
     return data
 
 
 def task(ticker):
-    kl = Candles.from_list(get_candles(ticker))
+    kl = Candles.from_list(get_candles(ticker), ticker)
 
     return ticker, kl
 

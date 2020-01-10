@@ -82,3 +82,6 @@ class AccountBalance:
             return 1 / self.tickers['BTCUSDT']
 
         return self.tickers[coin + 'BTC']
+
+    def get_tickers(self, type):
+        return self.tickers.get_tickers(type)
