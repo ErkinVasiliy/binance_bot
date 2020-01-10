@@ -22,6 +22,7 @@ class Candles:
         df['High'] = df['High'].astype(float)
         df['Low'] = df['Low'].astype(float)
         df['Close'] = df['Close'].astype(float)
+        df['BTC Volume'] = df['BTC Volume'].astype(float)
 
         return cls(df[['datetime', 'Open', 'High', 'Low', 'Close', 'BTC Volume']])
 

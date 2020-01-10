@@ -45,13 +45,11 @@ def add_volume(ax, open, close, vol):
     ax.fill_between(idx, 0, sma, facecolor='#07f2f9', alpha=0.3)
 
 
-def plot(klines, symbol, fig=None, start=0, end=None):
+def plot(klines, symbol, fig=None):
 
     style.use('fivethirtyeight')
 
     _, opens, highs, lows, closes, volumes = klines.columns
-
-    volumes = volumes.astype(float)
 
     # Create figure
     if fig is None:
@@ -64,18 +62,16 @@ def plot(klines, symbol, fig=None, start=0, end=None):
     candlestick2_ochl(ax1, opens, closes, highs, lows, width=1, colorup='g')
     ax1.set_ylim(lows.min() - lows.min() / 50)
 
-
     # Add a seconds axis for the volume overlay
     ax2 = ax1.twinx()
     ax2.set_ylim(0, 5 * volumes.max())
     ax2.grid(False)
 
     add_volume(ax2, opens, closes, volumes)
-    add_BBands(ax1, closes)
-
+    #add_BBands(ax1, closes)
 
     plt.title(symbol)
-    fig.savefig(r'C:\Users\erkin\Desktop\python projects\data\{}.png'.format(symbol), format='png',
+    fig.savefig(r'C:\graphs\{}.png'.format(symbol), format='png',
                 dpi=400)
     #plt.show()
 

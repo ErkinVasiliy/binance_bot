@@ -8,6 +8,7 @@ from time import sleep
 from .BalanceInfo import AccountBalance
 from .CandlesInfo import Candles
 from .binance_requests import get_candles
+from .plotter import plot
 
 
 API_KEY = 'api_key'
@@ -41,13 +42,14 @@ def get_klines(args):
     candles_list = get_candles('TNTBTC')
     candles = Candles.from_list(candles_list)
     candles.dump(settings[SAVE_PATH])
+    plot(candles, 'TNTBTC')
 
 
 def run():
     parser = ArgumentParser(prog='BinanceApp',
                             description='App for Binance trading')
     parser.add_argument('-s', '--setting_path', help='Path to setting file',
-                        required=True, dest='settings', type=str)
+                        dest='settings', type=str)
 
     work_type = parser.add_subparsers(title='work_type',
                                       help='Type of work for bot',
