@@ -6,7 +6,7 @@ add normal support of usd coins
 
 '''
 deprecated_tickers = ['DENTBTC', 'BCHSVBTC', 'BCCBTC', 'TRIGBTC', 'SALTBTC',
-                      'CLOAKBTC', 'RPXBTC', 'ICNBTC']
+                      'CLOAKBTC', 'RPXBTC', 'ICNBTC', 'BTTBTC', 'WINBTC']
 
 COINS_TYPES = ['USDT', 'BTC']
 
@@ -27,6 +27,27 @@ class Tickers:
         return [ticker for ticker, price in self._prices.items()
                 if ticker.endswith(type)]
 
+    #coin_name -> (price_to_btc, price_to_usdt)
+    def prices(self, coin):
+        btc_price = self._prices['BTCUSDT']
+
+        if coin == 'BTC':
+            price_to_btc = 1.0
+            price_to_usdt = btc_price
+        elif coin == 'USDT':
+            price_to_btc = 1 / btc_price
+            price_to_usdt = 1.0
+        else:
+            try:
+                price_to_btc = self._prices[coin + 'BTC']
+                price_to_usdt = price_to_btc * btc_price
+            except:
+                price_to_usdt = self._prices[coin + 'USDT']
+                price_to_btc = price_to_usdt / btc_price
+
+        return price_to_btc, price_to_usdt
+
+
     def __getitem__(self, item):
         return self._prices[item]
 
@@ -41,7 +62,6 @@ class AccountBalance:
         balance = self._client.get_account()['balances']
         self.tickers.update()
 
-        btc_price = self.tickers['BTCUSDT']
 
         for coin in balance:
             coin_volume = float(coin['free']) + float(coin['locked'])
@@ -50,15 +70,19 @@ class AccountBalance:
                 continue
 
             name = coin['asset']
+            btc_price, usdt_price = self.tickers.prices(name)
+
             info = {'name': name,
-                    'volume': coin_volume / btc_price,
-                    'price': self.__btc_price(name)}
+                    'BTC_volume': coin_volume * btc_price,
+                    'USDT_volume': coin_volume * usdt_price,
+                    'BTC_price': btc_price,
+                    'USDT_price': usdt_price}
 
             self.coins[name] = info
 
     @property
     def btc_balance(self):
-        return sum(c['volume'] for c in self.coins.values())
+        return sum(c['BTC_volume'] for c in self.coins.values())
 
     @property
     def usdt_balance(self):
@@ -66,22 +90,16 @@ class AccountBalance:
 
     def __str__(self):
         self.update()
-        balance_str = 'Balance: BTC-{}, USDT-{}'
-        coin_template = '{name}, volume: {volume:.5f}, BTC price: {price}'
+        balance_str = 'Balance: BTC-{:.5f}, USDT-{:.1f} '
+        coin_template = '{name}, BTC volume: {BTC_volume:.5f}, ' \
+                        'BTC price: {BTC_price:.8f}, ' \
+                        'USDT volume: {USDT_volume:.2f}, ' \
+                        'USDT price: {USDT_price:.7f}'
 
         strs = [coin_template.format(**coin) for coin in self.coins.values()]
         strs.append(balance_str.format(self.btc_balance, self.usdt_balance))
 
         return '\n'.join(strs)
-
-
-    def __btc_price(self, coin):
-        if coin == 'BTC':
-            return 1.0
-        if coin == 'USDT':
-            return 1 / self.tickers['BTCUSDT']
-
-        return self.tickers[coin + 'BTC']
 
     def get_tickers(self, type):
         return self.tickers.get_tickers(type)
