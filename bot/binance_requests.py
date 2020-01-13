@@ -1,11 +1,11 @@
 import requests
 from concurrent.futures import ThreadPoolExecutor
-
-from .CandlesInfo import Candles
 from collections import OrderedDict
 
+from .CandlesInfo import Candles
 
-def get_candles(ticker, interval='1d'):
+
+def get_candles(ticker, interval='4h'):
     url = 'https://api.binance.com/api/v1/klines?symbol='+ticker+'&interval='+interval
     data = requests.get(url).json()
     return data

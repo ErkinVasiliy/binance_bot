@@ -5,8 +5,7 @@ from scipy.signal import argrelextrema
 def compress_eq_neighbor(idxes):
     new_idxes = np.append(idxes, 0)
     return np.asarray([new_idxes[i] for i in range(new_idxes.size - 1)
-    if not new_idxes[i] + 1 == new_idxes[i + 1]])
-
+                        if not new_idxes[i] + 1 == new_idxes[i + 1]])
 
 
 def extr_points(points, indexes=None, extr_type=np.greater_equal):

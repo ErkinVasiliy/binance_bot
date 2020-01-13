@@ -6,8 +6,7 @@ from argparse import ArgumentParser
 from time import sleep
 
 from .BalanceInfo import AccountBalance
-from .CandlesInfo import Candles
-from .binance_requests import get_candles, get_all_candles
+from .binance_requests import get_all_candles
 from .plotter import plot
 
 
